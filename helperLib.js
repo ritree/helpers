@@ -3,7 +3,8 @@ var Helpers = {
     vars: {
         selectObjects: {}
     },
-
+    // привести вывод в консоль в читабельном виде 
+    // запретить вывод в консль не для разработчиков
     prettyConsole : function() {
         if(typeof console == 'undefined'){
             console = {
@@ -81,7 +82,8 @@ var Helpers = {
             };
         }
     },
-
+    
+    //объединение всех функций на событие ресайза окна
     resize: { 
         funcs: [],
         add: function(func){
@@ -105,7 +107,8 @@ var Helpers = {
             Helpers.resize.funcs = [];
         }
     },
-
+    
+    // работа с localStorage
     storage: {
         set: function(key, val){
             if(typeof val != 'string'){
@@ -127,7 +130,8 @@ var Helpers = {
             delete localStorage[key];
         }
     },
-
+    
+    // сохранение истории переходов для SPA
     history: {
         init: function(){
             $(window).on('popstate', function(e){
@@ -164,7 +168,8 @@ var Helpers = {
         },
         listing: []
     },
-
+    
+    // работа с cookie
     cookie: {
         set: function(name, value, expires, path, domain, secure){
             var expires = expires || new Date((new Date).valueOf() + 1000*3600*24*365);
@@ -191,6 +196,7 @@ var Helpers = {
     },
 
     elements: {
+        // хак для нахначения новых функций set&get для dom-элемента select
         makeJQHooks: function(){
             $.valHooks['select'] = {
                 set: function(e,val){
@@ -202,7 +208,8 @@ var Helpers = {
                 get: function( elem ) { var value, option, options = elem.options, index = elem.selectedIndex, one = elem.type === "select-one" || index < 0, values = one ? null : [], max = one ? index + 1 : options.length, i = index < 0 ? max : one ? index : 0; for ( ; i < max; i++ ) {option = options[ i ]; if ( ( option.selected || i === index ) && ( jQuery.support.optDisabled ? !option.disabled : option.getAttribute("disabled") === null ) && ( !option.parentNode.disabled || !jQuery.nodeName( option.parentNode, "optgroup" ) ) ) {value = jQuery( option ).val(); if ( one ) {return value; } values.push( value ); } } return values; }
             }
         },
-        
+
+        // прелоадер загрузки
         preloader: {
             init: function(elem) {
                 var elem = $(elem);
@@ -283,7 +290,7 @@ var Helpers = {
             }
         }
     },
-
+    // событие на загрузку скрипта
     loadJs: function(src, callback){
         console.log('Запрос на подгрузку скрипта', src, callback);
         $.getScript(src, function(e,a){
@@ -293,7 +300,8 @@ var Helpers = {
             }
         });
     },
-
+    
+    //конвертирование объекта в qwery_srting с возможностью исколючения
     objectToUrl: function(data, exclude){
         var exclude = exclude || [];
         var str = '';
@@ -303,15 +311,17 @@ var Helpers = {
         }
         return str;
     },
-
-    blink: function(elem){ // моргнуть элементом
+    
+    // моргнуть элементом
+    blink: function(elem){ 
         elem.classList.add('seeImHere');
         setTimeout(function(){
             elem.classList.remove('seeImHere');
         }, 400);
     },
-
-    parseSecondsToMinutes: function(sec){ // переводим "180 сек." в "3 мин."
+    
+    // переводим "180 сек." в "3 мин."
+    parseSecondsToMinutes: function(sec){ 
         var res = {
             'value': sec,
             'type': 'second'
@@ -323,7 +333,8 @@ var Helpers = {
         }
         return res;
     },
-
+    
+    // проверка на соответсвие даты в периоде
     validateDate: function(str, minDate, maxDate) {
         var matches = /^(\d{2})[-\/\.](\d{2})[-\/\.](\d{4})$/.exec(str.trim());
         if (matches == null) return false;
@@ -344,13 +355,15 @@ var Helpers = {
         else
             return false;
     },
-
-    validateDatePeriod: function(str, minDate, maxDate) { // проверяем, что строка из двух дат - допустимая
+    
+    // проверяем, что строка из двух дат - допустимая
+    validateDatePeriod: function(str, minDate, maxDate) { 
         var dateStrs = str.split('-').map(function(s){ return s.trim(); });
         var dates = dateStrs.map(function(date) { return Helpers.helper.validateDate(date, minDate, maxDate) });
         return (dates.length == 2) && dates[0] && dates[1] && dates[0] <= dates[1];
     },
-
+    
+    // исключение из урла одно из get параметров
     get_url: function(exclude, loc){
         var loc = loc || location.href;
         var new_path = '';
@@ -386,7 +399,8 @@ var Helpers = {
         search = search.split('&').filter(function(e){var exp = e.split('='); return exclude.indexOf(exp[0]) == -1 }).join('&');
         return url + search;
     },
-
+    
+    // возвращение параметра qwery_string из урла
     urlGetParam: function(url, param){
         var url = url || location.href;
         return url.split('?')[1].split('&').filter(function(e){return e.split('=')[0] == param}).map(function(e){return e.split('=')[1]});
@@ -553,6 +567,8 @@ var Helpers = {
         }
         return str.join('&');
     },
+    
+    // преобразование числа 100000 в 100'000
     formatNum: function(str, digs){
         if(digs == 'percent') {
             return str + '%';
@@ -568,6 +584,8 @@ var Helpers = {
         str = str.replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1’');
         return (function(str){var a = str.split('.');if(a.length<=1){return str};a[a.length-1]=a[a.length-1].replace(/\’/g,'');return a.join('.');})(str)
     },
+    
+    // преобразование числа в секунды
     parseSeconds: function(s){
         s = Number(s);
         var h = Math.floor(s / 3600);
@@ -581,12 +599,8 @@ var Helpers = {
 
         return h + ':' + m + ':' + s;
     },
-    getNameOfMonth: function(month){
-
-        var names = [__('Январь'), __('Февраль'), __('Март'), __('Апрель'), __('Май'), __('Июнь'), __('Июль'), __('Август'), __('Сентябрь'), __('Октябрь'), __('Ноябрь'), __('Декабрь')];
-
-        return names[ parseInt(month) -1 ];
-    },
+    
+    // возвращает только четные индексы массива
     arraySliceTwo: function(arr){
         var new_arr = []
         for(var i=0; i < arr.length; i++){
@@ -596,6 +610,8 @@ var Helpers = {
         }
         return new_arr;
     },
+    
+    // возвращает массив в процентах
     array2proc: function(arr){
         if(arr == null)return arr;
         for(var i=0; i<arr.length; i++){
@@ -603,6 +619,8 @@ var Helpers = {
         }
         return arr;
     },
+    
+    // возвращает массив с опреденнным числом символов после запятой
     array2fixed: function(arr, len){
         var len = len || 4;
         if(arr == null)return arr;
@@ -626,8 +644,9 @@ var Helpers = {
     getElementFromCoords: function(x, y){
         return $(document.elementFromPoint(x,y));
     },
-
-    stopEvents: function(e){  // остановка дальнейших событий
+    
+    // остановка дальнейших событий
+    stopEvents: function(e){  
         try{
             var evt = e || window.event;
             if(evt.originalEvent){
